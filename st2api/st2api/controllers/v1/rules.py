@@ -28,6 +28,7 @@ from st2common.persistence.rule import Rule
 from st2common.rbac.types import PermissionType
 from st2common.rbac import utils as rbac_utils
 from st2common.rbac.utils import assert_user_has_rule_trigger_and_action_permission
+from st2common.rbac.utils import assert_user_is_admin_if_user_query_param_is_provided
 from st2common.router import exc
 from st2common.router import abort
 from st2common.router import Response
@@ -52,7 +53,8 @@ class RuleController(resource.ContentPackResourceController):
         'pack': 'pack',
         'action': 'action.ref',
         'trigger': 'trigger',
-        'enabled': 'enabled'
+        'enabled': 'enabled',
+        'user': 'context.user'
     }
 
     filter_transform_functions = {
@@ -92,6 +94,16 @@ class RuleController(resource.ContentPackResourceController):
         rbac_utils.assert_user_has_resource_api_permission(user_db=requester_user,
                                                            resource_api=rule,
                                                            permission_type=permission_type)
+
+        # Validate that the authenticated user is admin if user query param is provided
+        user = requester_user.name
+        assert_user_is_admin_if_user_query_param_is_provided(user_db=requester_user,
+                                                             user=user)
+
+        if not hasattr(rule, 'context'):
+            rule.context = dict()
+
+        rule.context['user'] = user
 
         try:
             rule_db = RuleAPI.to_model(rule)

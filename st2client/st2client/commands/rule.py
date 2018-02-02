@@ -38,7 +38,7 @@ class RuleBranch(resource.ResourceBranch):
 
 
 class RuleListCommand(resource.ResourceTableCommand):
-    display_attributes = ['ref', 'pack', 'description', 'enabled']
+    display_attributes = ['ref', 'pack', 'description', 'enabled', 'context.user']
     display_attributes_iftt = ['ref', 'trigger.ref', 'action.ref', 'enabled']
 
     def __init__(self, resource, *args, **kwargs):
@@ -85,6 +85,8 @@ class RuleListCommand(resource.ResourceTableCommand):
             kwargs['enabled'] = True
         if args.disabled:
             kwargs['enabled'] = False
+        if args.user:
+            kwargs['context.user'] = args.user
         if args.iftt:
             # switch attr to display the trigger and action
             args.attr = self.display_attributes_iftt
