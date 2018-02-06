@@ -85,8 +85,6 @@ class RuleListCommand(resource.ResourceTableCommand):
             kwargs['enabled'] = True
         if args.disabled:
             kwargs['enabled'] = False
-        if args.user:
-            kwargs['context.user'] = args.user
         if args.iftt:
             # switch attr to display the trigger and action
             args.attr = self.display_attributes_iftt
